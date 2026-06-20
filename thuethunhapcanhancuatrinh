@@ -1,38 +1,37 @@
 import streamlit as st
 st.image("IMG_20260425_142016.jpg")
 
-st.title("Ứng dụng tính Thuế Thu nhập cá nhân - Ngọc Trinh")
-
 # Nhập dữ liệu
-thu_nhap = st.number_input(
-    "Nhập thu nhập hàng tháng (triệu đồng)",
+luong = st.number_input(
+    "Nhập lương gộp hàng tháng (triệu đồng)",
     min_value=0.0,
     value=20.0
 )
 
 nguoi_phu_thuoc = st.number_input(
-    "Số người phụ thuộc",
+    "Nhập số người phụ thuộc",
     min_value=0,
     value=0
 )
 
 if st.button("Tính thuế"):
 
-    # Tính bảo hiểm người lao động đóng (10,5%)
-    bao_hiem = thu_nhap * 0.105
+    # Tính bảo hiểm người lao động phải đóng
+    bao_hiem = luong * 0.105
 
-    # Giảm trừ gia cảnh
+    # Tính giảm trừ gia cảnh
     giam_tru_ban_than = 15.5
-    giam_tru_phu_thuoc = 6.2 * nguoi_phu_thuoc
+    giam_tru_phu_thuoc = nguoi_phu_thuoc * 6.2
 
     # Thu nhập tính thuế
     thu_nhap_tinh_thue = (
-        thu_nhap
+        luong
         - bao_hiem
         - giam_tru_ban_than
         - giam_tru_phu_thuoc
     )
 
+    # Tính thuế lũy tiến từng phần
     if thu_nhap_tinh_thue <= 0:
         thue = 0
 
@@ -69,16 +68,18 @@ if st.button("Tính thuế"):
             + (thu_nhap_tinh_thue - 100) * 0.35
         )
 
+    # Hiển thị kết quả
     st.success("Kết quả tính thuế")
 
     st.write(
-        f"📌 Bảo hiểm phải đóng: **{bao_hiem:.2f} triệu đồng**"
+        f"📌 Bảo hiểm phải đóng: {bao_hiem:.2f} triệu đồng"
     )
 
     st.write(
-        f"📌 Thu nhập tính thuế: **{max(thu_nhap_tinh_thue, 0):.2f} triệu đồng**"
+        f"📌 Thu nhập tính thuế: {max(thu_nhap_tinh_thue, 0):.2f} triệu đồng"
     )
 
     st.write(
-        f"📌 Thuế TNCN phải nộp: **{thue:.2f} triệu đồng/tháng**"
+        f"📌 Thuế thu nhập cá nhân phải nộp: {thue:.2f} triệu đồng/tháng"
     )
+            
