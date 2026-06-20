@@ -1,50 +1,83 @@
-def tinh_thue_tncn(luong_gop, so_nguoi_phu_thuoc=0):
-    # Bảo hiểm người lao động đóng
-    bao_hiem = luong_gop * 0.105
-    
+import streamlit as st
+
+st.title("Ứng dụng tính Thuế Thu nhập cá nhân - Ngọc Trinh")
+
+# Nhập dữ liệu
+thu_nhap = st.number_input(
+    "Nhập thu nhập hàng tháng (triệu đồng)",
+    min_value=0.0,
+    value=20.0
+)
+
+nguoi_phu_thuoc = st.number_input(
+    "Số người phụ thuộc",
+    min_value=0,
+    value=0
+)
+
+if st.button("Tính thuế"):
+
+    # Tính bảo hiểm người lao động đóng (10,5%)
+    bao_hiem = thu_nhap * 0.105
+
     # Giảm trừ gia cảnh
-    giam_tru_ban_than = 15500000
-    giam_tru_phu_thuoc = so_nguoi_phu_thuoc * 6200000
+    giam_tru_ban_than = 15.5
+    giam_tru_phu_thuoc = 6.2 * nguoi_phu_thuoc
 
     # Thu nhập tính thuế
     thu_nhap_tinh_thue = (
-        luong_gop 
-        - bao_hiem 
-        - giam_tru_ban_than 
+        thu_nhap
+        - bao_hiem
+        - giam_tru_ban_than
         - giam_tru_phu_thuoc
     )
 
     if thu_nhap_tinh_thue <= 0:
-        return 0
+        thue = 0
 
-    thue = 0
+    elif thu_nhap_tinh_thue <= 10:
+        thue = thu_nhap_tinh_thue * 0.05
 
-    # Tính thuế lũy tiến
-    bac_thue = [
-        (10000000, 0.05),
-        (30000000, 0.10),
-        (60000000, 0.20),
-        (100000000, 0.30),
-        (float("inf"), 0.35)
-    ]
+    elif thu_nhap_tinh_thue <= 30:
+        thue = (
+            10 * 0.05
+            + (thu_nhap_tinh_thue - 10) * 0.10
+        )
 
-    muc_duoi = 0
+    elif thu_nhap_tinh_thue <= 60:
+        thue = (
+            10 * 0.05
+            + 20 * 0.10
+            + (thu_nhap_tinh_thue - 30) * 0.20
+        )
 
-    for muc_tren, thue_suat in bac_thue:
-        if thu_nhap_tinh_thue > muc_tren:
-            thue += (muc_tren - muc_duoi) * thue_suat
-            muc_duoi = muc_tren
-        else:
-            thue += (thu_nhap_tinh_thue - muc_duoi) * thue_suat
-            break
+    elif thu_nhap_tinh_thue <= 100:
+        thue = (
+            10 * 0.05
+            + 20 * 0.10
+            + 30 * 0.20
+            + (thu_nhap_tinh_thue - 60) * 0.30
+        )
 
-    return thue
+    else:
+        thue = (
+            10 * 0.05
+            + 20 * 0.10
+            + 30 * 0.20
+            + 40 * 0.30
+            + (thu_nhap_tinh_thue - 100) * 0.35
+        )
 
+    st.success("Kết quả tính thuế")
 
-# Nhập dữ liệu
-luong = float(input("Nhập lương gộp (VNĐ): "))
-nguoi_phu_thuoc = int(input("Số người phụ thuộc: "))
+    st.write(
+        f"📌 Bảo hiểm phải đóng: **{bao_hiem:.2f} triệu đồng**"
+    )
 
-thue = tinh_thue_tncn(luong, nguoi_phu_thuoc)
+    st.write(
+        f"📌 Thu nhập tính thuế: **{max(thu_nhap_tinh_thue, 0):.2f} triệu đồng**"
+    )
 
-print("Thuế TNCN phải nộp:", format(thue, ",.0f"), "VNĐ")
+    st.write(
+        f"📌 Thuế TNCN phải nộp: **{thue:.2f} triệu đồng/tháng**"
+    )
